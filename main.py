@@ -9,7 +9,7 @@ class ChessGUI:
         self.canvas.pack()
         
         self.selected = None  # Initialize the selected attribute here
-        self.turn = 1
+        self.turn = 0
         
         self.draw_board()
         self.pieces = self.load_pieces()
@@ -50,7 +50,8 @@ class ChessGUI:
             ["p", "p", "p", "p", "p", "p", "p", "p"],
             ["t", "c", "a", "q", "r", "a", "c", "t"]
         ]
-    
+
+
     def draw_pieces(self):
         self.canvas.delete("piece")
         for row in range(8):
@@ -60,19 +61,45 @@ class ChessGUI:
                     x, y = col * 50 + 25, row * 50 + 25
                     self.canvas.create_text(x, y, text=self.pieces[piece], font=("Arial", 24), tags="piece")
 
+    def get_color(self, piece): 
+        return "white" if piece.lower() == piece else "black"
+         
+    def valid_move(self, col, row, pieceType): 
+        selected_row, selected_col = self.selected
+        if col == selected_col and row == selected_row: return False
+        return True
+        # if pieceType == "r": 
+
+
+
+    def draw_drop_places(self):
+        self.canvas.delete("piece")
+        selected_row, selected_col = self.selected
+        piece = self.board[selected_row][selected_col]
+        pieceColor = self.get_color(piece)
+        pieceType = piece.lower()
+
+        for row in range(8):
+            for col in range(8):
+                if (self.valid_move(col, row, pieceType)) :
+                    x, y = col * 50 + 25, row * 50 + 25
+                    self.canvas.create_text(x, y, text="X", font=("Arial", 24), tags="place")
+
+
     
     def select_piece(self, event):
         col, row = event.x // 50, event.y // 50
         if self.selected is None:
             if self.board[row][col]:
-                pieceColor = "white" if self.board[row][col].lower() == self.board[row][col] else "black"
+                pieceColor = self.get_color(self.board[row][col])
                 if (self.turn == 0 and pieceColor == "white") or (self.turn == 1 and pieceColor == "black"):
                     self.selected = (row, col)
         else:
             selected_row, selected_col = self.selected
             piece = self.board[selected_row][selected_col] # original selected
-            pieceColor = "white" if piece.lower() == piece else "black"
-            otherPieceColor = "white" if self.board[row][col].lower() == self.board[row][col] else "black"
+            
+            pieceColor = self.get_color(piece)
+            otherPieceColor = self.get_color(self.board[row][col])
             if(self.board[row][col] == "") or (pieceColor != otherPieceColor):
                 self.board[row][col] = piece
                 self.board[selected_row][selected_col] = ""
@@ -84,6 +111,7 @@ class ChessGUI:
                 else: 
                     self.selected = (row, col)
         self.draw_board()  # Redraw the board after selection/move
+        if self.selected != None : self.draw_drop_places()
         self.draw_pieces()
 
 if __name__ == "__main__":
