@@ -3,7 +3,7 @@ import tkinter as tk
 class ChessGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Chess in Tkinter")
+        self.root.title("Chess Python")
         
         self.canvas = tk.Canvas(root, width=400, height=400)
         self.canvas.pack()
